@@ -2,11 +2,12 @@
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
 /*    Author:       LEGION                                                    */
-/*    Created:      9/27/2023, 7:42:26 PM                                     */
+/*    Created:      2023/10/22 20:03:24                                       */
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 #include "vex.h"
+
 
 using namespace vex;
 
@@ -17,19 +18,42 @@ vex::brain       Brain;
 
 
 int main() {
-    vex::motor motor1(0);
-    vex::motor motor2(9);
-    while(1)
-    {
-     motor1.spinToPosition(10.8, vex:: rotationUnits::rev,90, vex:: velocityUnits::rpm, true);
-    motor2.spinToPosition(-10.6, vex:: rotationUnits::rev,90, vex:: velocityUnits::rpm, true);
-     motor1.resetPosition();
-     motor2.resetPosition();
-     wait(100,msec);
+     vex::motor motor1(17);
+     vex::motor motor2(16);
+    vex::motor motor3(18);
+    vex::motor motor4(19);
+    vex::controller Controller;
+       int MAX_SPEED = 1;//速度上限；        
 
+        while(1) {
+
+    float axisP_3 = Controller.Axis3.position();
+    float axisP_4 = Controller.Axis4.position();
+    
+  // 根据摇杆位置计算左右轮的速度
+  float speed1 = axisP_3 + axisP_4; 
+  float speed2 = axisP_3 - axisP_4; 
+    // 纯前后移动
+  if(axisP_4 == 0) {
+  speed1 = axisP_3;
+  speed2 = axisP_3;
+
+  // 左转  
+  } else if(axisP_4 < 0) {  
+  speed1 = (axisP_3 + axisP_4 );
+  speed2 = (axisP_3 - axisP_4);
+
+  // 右转
+  } else {
+  speed1 = (axisP_3 + axisP_4); 
+  speed2 = (axisP_3- axisP_4);
+  }
+
+    motor1.spin(vex::directionType::rev, speed1, rpm);
+    motor2.spin(vex::directionType::rev, speed1, rpm);
+    motor3.spin(fwd, speed2, rpm);
+    motor4.spin(fwd, speed2, rpm);
     }
-    //motor1.spinToPosition(360, vex:: rotationUnits::rev,1000, vex:: velocityUnits::rpm, true);
-//public bool vex::motor::spinToPosition(double rotation, rotationUnits units, double velocity, velocityUnits units_v, bool waitForCompletion=true)
-
+ 
     return 0;
 }
